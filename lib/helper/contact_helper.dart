@@ -1,5 +1,7 @@
-import 'package:sqflite/sqflite.dart';
+import 'dart:async';
+
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 final String contactTable = "contactTable";
 final String idColumn = "idColumn";
@@ -9,9 +11,9 @@ final String phoneColumn = "phoneColumn";
 final String imgColumn = "imgColumn";
 
 class ContactHelper {
-  static final ContactHelper _intance = ContactHelper.internal();
+  static final ContactHelper _instance = ContactHelper.internal();
 
-  factory ContactHelper() => _intance;
+  factory ContactHelper() => _instance;
 
   ContactHelper.internal();
 
@@ -28,15 +30,13 @@ class ContactHelper {
 
   Future<Database> initDb() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, "contacts.db");
+    final path = join(databasesPath, "contactsnew.db");
+
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
-      await db.execute("CREATE TABLE $contactTable("
-          "$idColumn INTEGER PRIMARY KEY, "
-          "$nameColumn TEXT, "
-          "$emailColumn TEXT, "
-          "$phoneColumn TEXT, "
-          "$imgColumn TEXT) ");
+      await db.execute(
+          "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT,"
+          "$phoneColumn TEXT, $imgColumn TEXT)");
     });
   }
 
@@ -71,9 +71,9 @@ class ContactHelper {
         where: "$idColumn = ?", whereArgs: [contact.id]);
   }
 
-  Future<List> getAllContact() async {
+  Future<List> getAllContacts() async {
     Database dbContact = await db;
-    List listMap = dbContact.rawQuery("SELECT * FROM $contactTable") as List;
+    List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable");
     List<Contact> listContact = List();
     for (Map m in listMap) {
       listContact.add(Contact.fromMap(m));
@@ -94,13 +94,13 @@ class ContactHelper {
 }
 
 class Contact {
-  Contact();
-
   int id;
   String name;
   String email;
   String phone;
   String img;
+
+  Contact();
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
@@ -120,10 +120,11 @@ class Contact {
     if (id != null) {
       map[idColumn] = id;
     }
+    return map;
   }
 
   @override
   String toString() {
-    return "Contact(id: $id,name: $name, email: $email, phone: $email,img: $img)";
+    return "Contact(id: $id, name: $name, email: $email, phone: $phone, img: $img)";
   }
 }
