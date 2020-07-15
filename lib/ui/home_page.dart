@@ -94,10 +94,10 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: contacts[index].img != null
-                          ? FileImage(File(contacts[index].img))
-                          : AssetImage("images/person.png"),
-                    )),
+                        image: contacts[index].img != null
+                            ? FileImage(File(contacts[index].img))
+                            : AssetImage("images/person.png"),
+                        fit: BoxFit.cover)),
               ),
               Padding(
                 padding: EdgeInsets.only(left: 10),
